@@ -166,7 +166,7 @@ contract ERC721 is Pausable, ERC165 {
         // TIP: remember the functions to use for Counters. you can refresh yourself with the link above
     }
 
-    function ownerOf(tokenId( == from, "Not owner of token");uint256 tokenId) public view returns (address) {
+    function ownerOf(uint256 tokenId) public view returns (address) {
         // TODO return the owner of the given tokenId
         return _tokenOwner[tokenId];
     }
@@ -175,7 +175,7 @@ contract ERC721 is Pausable, ERC165 {
     function approve(address to, uint256 tokenId) public {
         require(_tokenOwner[tokenId] == msg.sender, "Only owner of token can approve another address");
         // TODO require the given address to not be the owner of the tokenId
-        require(getOwner() == msg.sender || isApprovedForAll(ownerOf(tokenId( == from, "Not owner of token");tokenId), msg.sender) == true, "Not contract owner");
+        require(getOwner() == msg.sender || isApprovedForAll(ownerOf(tokenId), msg.sender) == true, "Not contract owner");
         // TODO require the msg sender to be the owner of the contract or isApprovedForAll() to be true
         _tokenApprovals[tokenId] = to;
         // TODO add 'to' address to token approvals
@@ -187,7 +187,7 @@ contract ERC721 is Pausable, ERC165 {
     function getApproved(uint256 tokenId) public view returns (address) {
         require(_exists(tokenId), "token does not exist");
         // TODO return token approval if it exists
-        return _tokenApprovals[tokenId]
+        return _tokenApprovals[tokenId];
     }
 
     /**
@@ -245,16 +245,13 @@ contract ERC721 is Pausable, ERC165 {
      * is an operator of the owner, or is the owner of the token
      */
     function _isApprovedOrOwner(address spender, uint256 tokenId) internal view returns (bool) {
-        address owner = ownerOf(tokenId( == from, "Not owner of token");tokenId);
+        address owner = ownerOf(tokenId);
         return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
     }
 
     // @dev Internal function to mint a new token
     // TIP: remember the functions to use for Counters. you can refresh yourself with the link above
-    function _mint(to, tokenId);
-    setTokenURI(tokenId);
-    
-            return true;(address to, uint256 tokenId) internal {
+    function _mint(address to, uint256 tokenId) internal {
         require(_exists(tokenId) == false, "token already exists");
         require(to != address(0), "address is invalid");
         // TODO revert if given tokenId already exists or given address is invalid
@@ -274,8 +271,8 @@ contract ERC721 is Pausable, ERC165 {
         // TODO: require token is being transfered to valid address
         _clearApproval(tokenId);
         // TODO: clear approval
-        ownedTokensCount[from].decrement();
-        ownedTokensCount[to].increment();
+        _ownedTokensCount[from].decrement();
+        _ownedTokensCount[to].increment();
         _tokenOwner[tokenId] = to;
         // TODO: update token counts & transfer ownership of the token ID 
         emit Transfer(from, to, tokenId);
@@ -390,15 +387,8 @@ contract ERC721Enumerable is ERC165, ERC721 {
      * @param to address the beneficiary that will own the minted token
      * @param tokenId uint256 ID of the token to be minted
      */
-    function _mint(to, tokenId);
-    setTokenURI(tokenId);
-    
-            return true;(address to, uint256 tokenId) internal {
+    function _mint(address to, uint256 tokenId) internal {
         super._mint(to, tokenId);
-        setTokenURI(tokenId);
-        
-    
-            return true;(to, tokenId);
 
         _addTokenToOwnerEnumeration(to, tokenId);
 
@@ -533,13 +523,6 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
     function tokenURI(uint256 tokenId) external view returns (string memory) {
         require(_exists(tokenId));
         return _tokenURIs[tokenId];
-    }
-
-    function getBaseTokenURI()
-    external view
-    returns (string memory)
-    {
-        return _baseTokenURI;
     }
 
     function setTokenURI(uint256 tokenId) internal {
