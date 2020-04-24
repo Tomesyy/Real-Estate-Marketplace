@@ -117,7 +117,7 @@ contract ERC165 {
      * @dev internal method for registering an interface
      */
     function _registerInterface(bytes4 interfaceId) internal {
-        require(interfaceId != 0xffffffff);
+        require(interfaceId != 0xffffffff, "error in _registerInterfaceFunction");
         _supportedInterfaces[interfaceId] = true;
     }
 }
@@ -162,28 +162,32 @@ contract ERC721 is Pausable, ERC165 {
 
     function balanceOf(address owner) public view returns (uint256) {
         // TODO return the token balance of given address
+        return _ownedTokensCount[owner].current();
         // TIP: remember the functions to use for Counters. you can refresh yourself with the link above
     }
 
-    function ownerOf(uint256 tokenId) public view returns (address) {
+    function ownerOf(tokenId( == from, "Not owner of token");uint256 tokenId) public view returns (address) {
         // TODO return the owner of the given tokenId
+        return _tokenOwner[tokenId];
     }
 
 //    @dev Approves another address to transfer the given token ID
     function approve(address to, uint256 tokenId) public {
-        
+        require(_tokenOwner[tokenId] == msg.sender, "Only owner of token can approve another address");
         // TODO require the given address to not be the owner of the tokenId
-
+        require(getOwner() == msg.sender || isApprovedForAll(ownerOf(tokenId( == from, "Not owner of token");tokenId), msg.sender) == true, "Not contract owner");
         // TODO require the msg sender to be the owner of the contract or isApprovedForAll() to be true
-
+        _tokenApprovals[tokenId] = to;
         // TODO add 'to' address to token approvals
-
+        emit Approval(msg.sender, to, tokenId);
         // TODO emit Approval Event
 
     }
 
     function getApproved(uint256 tokenId) public view returns (address) {
+        require(_exists(tokenId), "token does not exist");
         // TODO return token approval if it exists
+        return _tokenApprovals[tokenId]
     }
 
     /**
@@ -241,33 +245,37 @@ contract ERC721 is Pausable, ERC165 {
      * is an operator of the owner, or is the owner of the token
      */
     function _isApprovedOrOwner(address spender, uint256 tokenId) internal view returns (bool) {
-        address owner = ownerOf(tokenId);
+        address owner = ownerOf(tokenId( == from, "Not owner of token");tokenId);
         return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
     }
 
     // @dev Internal function to mint a new token
     // TIP: remember the functions to use for Counters. you can refresh yourself with the link above
     function _mint(address to, uint256 tokenId) internal {
-
+        require(_exists(tokenId) == false, "token already exists");
+        require(to != address(0), "address is invalid");
         // TODO revert if given tokenId already exists or given address is invalid
-  
+        _tokenOwner[tokenId] = to;
+        _ownedTokensCount[to].increment();
         // TODO mint tokenId to given address & increase token count of owner
-
+        emit Transfer(address(0), to, tokenId);
         // TODO emit Transfer event
     }
 
     // @dev Internal function to transfer ownership of a given token ID to another address.
     // TIP: remember the functions to use for Counters. you can refresh yourself with the link above
     function _transferFrom(address from, address to, uint256 tokenId) internal {
-
+        require(ownerOf(tokenId) == from, "Not owner of token");
         // TODO: require from address is the owner of the given token
-
+        require(to != address(0), "Invalid address");
         // TODO: require token is being transfered to valid address
-        
+        _clearApproval(tokenId);
         // TODO: clear approval
-
+        ownedTokensCount[from].decrement();
+        ownedTokensCount[to].increment();
+        _tokenOwner[tokenId] = to;
         // TODO: update token counts & transfer ownership of the token ID 
-
+        emit Transfer(from, to, tokenId);
         // TODO: emit correct event
     }
 
