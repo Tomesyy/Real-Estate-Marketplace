@@ -28,8 +28,14 @@ contract Ownable {
 
     event OwnershipTransferred(address oldOwner, address newOwner);
 
+    function getOwner() public view returns(address owner){
+        owner = _owner;
+    }
+
     function transferOwnership(address newOwner) public onlyOwner {
         // TODO add functionality to transfer control of the contract to a newOwner.
+        require(!Address.isContract(newOwner), "Cannot transfer ownership to contract");
+        require(newOwner != address(0), "Invalid address");
         address oldOwner = _owner;
         _owner = newOwner;
         // make sure the new owner is a real address
@@ -40,10 +46,41 @@ contract Ownable {
 
 //  TODO's: Create a Pausable contract that inherits from the Ownable contract
 //  1) create a private '_paused' variable of type bool
-//  2) create a public setter using the inherited onlyOwner modifier 
+//  2) create a public setter using the inherited onlyOwner modifier
 //  3) create an internal constructor that sets the _paused variable to false
 //  4) create 'whenNotPaused' & 'paused' modifier that throws in the appropriate situation
 //  5) create a Paused & Unpaused event that emits the address that triggered the event
+
+contract Pausable is Ownable {
+    bool private _paused;
+
+    constructor() internal {
+        _paused = false;
+    }
+
+    event Paused(bool _paused);
+    event Unpaused(bool _paused);
+
+    modifier whenNotPaused {
+        require(_paused == false, "Contract is paused");
+        _;
+    }
+
+    modifier paused {
+        require(_paused == true, "Contract is not paused");
+        _;
+    }
+
+    function getPaused() public view returns(bool status) {
+        status = _paused;
+    }
+
+    function setPaused(bool status) public onlyOwner {
+        require(status != _paused, "contract is already set to status");
+        _paused = status;
+    }
+
+}
 
 contract ERC165 {
     bytes4 private constant _INTERFACE_ID_ERC165 = 0x01ffc9a7;
