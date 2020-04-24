@@ -58,8 +58,8 @@ contract Pausable is Ownable {
         _paused = false;
     }
 
-    event Paused(bool _paused);
-    event Unpaused(bool _paused);
+    event Paused(address pauser);
+    event Unpaused(address pauser);
 
     modifier whenNotPaused {
         require(_paused == false, "Contract is paused");
@@ -77,7 +77,11 @@ contract Pausable is Ownable {
 
     function setPaused(bool status) public onlyOwner {
         require(status != _paused, "contract is already set to status");
-        _paused = status;
+        if(status == true){
+            emit Paused(msg.sender);
+        } else {
+            emit Unpaused(msg.sender);
+        }
     }
 
 }
