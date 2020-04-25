@@ -17,6 +17,7 @@
     "openzeppelin-solidity": "^2.5.0",
     "solc": "^0.5.17",
     "solc-js": "^0.5.5",
-    "truffle-hdwallet-provider": "^1.0.17"
+    "truffle-hdwallet-provider": "^1.0.17",
+    "web3": "^1.2.7"
   }
 }
